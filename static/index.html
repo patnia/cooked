@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#c1440e" />
+  <title>What's Cooking</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/static/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="/static/icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="blob blob-a"></div>
+  <div class="blob blob-b"></div>
+
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 11h16v3a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6v-3z"/>
+          <path d="M2 11h20"/>
+          <path d="M9 6c0-1 .8-1 .8-2S9 2 9 2" stroke-width="1.3"/>
+          <path d="M12 6c0-1 .8-1 .8-2S12 2 12 2" stroke-width="1.3"/>
+          <path d="M15 6c0-1 .8-1 .8-2S15 2 15 2" stroke-width="1.3"/>
+        </svg>
+      </div>
+      <h1>What's Cooking</h1>
+    </div>
+    <div id="account-bar" class="account-bar hidden">
+      <span id="account-email" class="muted"></span>
+      <a href="#" id="btn-logout">Log out</a>
+    </div>
+  </header>
+
+  <main id="app">
+    <div id="error-banner" class="error-banner hidden"></div>
+
+    <!-- View: landing (first thing a logged-out visitor sees) -->
+    <section id="view-landing" class="view view-centered active">
+      <div class="landing-mark">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 11h16v3a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6v-3z"/>
+          <path d="M2 11h20"/>
+          <path d="M9 6c0-1 .8-1 .8-2S9 2 9 2" stroke-width="1.3"/>
+          <path d="M12 6c0-1 .8-1 .8-2S12 2 12 2" stroke-width="1.3"/>
+          <path d="M15 6c0-1 .8-1 .8-2S15 2 15 2" stroke-width="1.3"/>
+        </svg>
+      </div>
+      <h2 class="landing-title">What's Cooking</h2>
+      <p class="landing-tagline">Tell us what you're craving.<br />We'll handle the shopping list.</p>
+      <div class="landing-chips">
+        <span class="chip">curry</span>
+        <span class="chip">cocktail</span>
+        <span class="chip">dessert</span>
+      </div>
+      <div class="landing-actions">
+        <button id="btn-landing-signup" class="btn-primary">Get started</button>
+        <button id="btn-landing-login" class="btn-text">I already have an account</button>
+      </div>
+    </section>
+
+    <!-- View: auth (login / signup) -->
+    <section id="view-auth" class="view view-centered">
+      <div id="auth-login">
+        <h2>Welcome back!</h2>
+        <p class="muted">Good to see you again</p>
+        <label class="field">
+          <span>Email</span>
+          <input type="email" id="login-email" autocomplete="email" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input type="password" id="login-password" autocomplete="current-password" />
+        </label>
+        <button id="btn-login" class="btn-primary">Log in</button>
+        <p class="muted auth-switch">New here? <a href="#" id="link-to-signup">Create an account</a></p>
+      </div>
+
+      <div id="auth-signup" class="hidden">
+        <h2>Create account</h2>
+        <label class="field">
+          <span>Email</span>
+          <input type="email" id="signup-email" autocomplete="email" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input type="password" id="signup-password" autocomplete="new-password" />
+        </label>
+        <button id="btn-signup-continue" class="btn-primary">Continue</button>
+        <p class="muted auth-switch">Already have an account? <a href="#" id="link-to-login">Log in</a></p>
+      </div>
+    </section>
+
+    <!-- View: onboarding wizard, shown once right after signup -->
+    <section id="view-onboarding" class="view view-centered">
+      <h2 id="onboarding-prompt"></h2>
+      <div id="onboarding-options" class="choice-list"></div>
+      <button id="onboarding-continue" class="btn-primary hidden">Continue</button>
+    </section>
+
+    <!-- View: quiz, for "not sure what to eat" -->
+    <section id="view-quiz" class="view">
+      <button id="btn-quiz-cancel" class="btn-text quiz-cancel" type="button">← Back</button>
+      <div class="quiz-body">
+        <h2 id="quiz-prompt"></h2>
+        <div id="quiz-options" class="choice-list"></div>
+        <button id="quiz-continue" class="btn-primary hidden">Continue</button>
+      </div>
+    </section>
+
+    <!-- View 1: input -->
+
+    <section id="view-input" class="view view-centered">
+      <label class="field">
+        <span>What do you want to cook?</span>
+        <textarea id="dish-input" rows="2" placeholder="e.g. butter chicken for 3"></textarea>
+      </label>
+
+      <div class="quiz-card">
+        <span>Not sure what to eat?</span>
+        <a href="#" id="link-take-quiz">Take a quiz →</a>
+      </div>
+
+      <div class="pref-grid">
+        <label class="pref-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 5a2 2 0 0 1 2-2h6v16H6a2 2 0 0 0-2 2V5z"/><path d="M20 5a2 2 0 0 0-2-2h-6v16h6a2 2 0 0 1 2 2V5z"/></svg>
+          <select id="pref-steps-mode">
+            <option value="written">Written steps</option>
+            <option value="video">Video (YouTube link)</option>
+            <option value="both">Both</option>
+          </select>
+        </label>
+
+        <label class="pref-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21h10"/><path d="M8 21v-5"/><path d="M16 21v-5"/><path d="M6 12a4 4 0 0 1 3-6 4 4 0 0 1 6 0 4 4 0 0 1 3 6c0 2-1 3-2 4H8c-1-1-2-2-2-4z"/></svg>
+          <select id="pref-skill-level">
+            <option value="never_made_it">Never made it</option>
+            <option value="done_it_before">Done it before</option>
+            <option value="comfortable">Comfortable</option>
+          </select>
+        </label>
+
+        <label class="pref-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s-4 4-4 8a4 4 0 0 0 8 0c0-1.5-.7-2.3-1.4-3 .2 1.4-.7 2-1.4 2a1.4 1.4 0 0 1-1.4-1.4c0-1 .8-1.4.8-2.6z"/></svg>
+          <select id="pref-appliance">
+            <option value="stovetop">Stovetop</option>
+            <option value="pressure_cooker">Pressure cooker</option>
+            <option value="oven">Oven</option>
+            <option value="air_fryer">Air fryer</option>
+          </select>
+        </label>
+
+        <label class="pref-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c3 3 3 15 0 18"/><path d="M12 3c-3 3-3 15 0 18"/></svg>
+          <select id="pref-language">
+            <option value="english">English</option>
+            <option value="hindi">Hindi</option>
+          </select>
+        </label>
+      </div>
+
+      <button id="btn-extract" class="btn-primary">Find ingredients →</button>
+
+      <div class="random-strip">
+        <div class="muted random-strip-label">Not sure? Try something random</div>
+        <div class="landing-chips">
+          <span class="chip">curry</span>
+          <span class="chip">cocktail</span>
+          <span class="chip">dessert</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 2: pantry checkoff -->
+    <section id="view-checkoff" class="view">
+      <h2 id="checkoff-dish-name"></h2>
+      <p id="checkoff-serves" class="muted"></p>
+      <p class="muted">Uncheck what you already have.</p>
+      <div id="ingredient-groups"></div>
+      <div class="button-row">
+        <button id="btn-back-to-input" class="btn-secondary">Back</button>
+        <button id="btn-generate" class="btn-primary">Get shopping list</button>
+      </div>
+    </section>
+
+    <!-- View 3: shopping list -->
+    <section id="view-result" class="view">
+      <h2 id="result-dish-name"></h2>
+      <div id="shopping-list"></div>
+
+      <p class="muted ready-note">Press once you've got everything prepped and ready to go.</p>
+      <button id="btn-ingredients-ready" class="btn-primary">Ingredients ready?</button>
+    </section>
+
+    <!-- View 4: steps -->
+    <section id="view-steps" class="view">
+      <div class="steps-body">
+        <h2 id="steps-dish-name"></h2>
+
+        <div id="video-block" class="hidden">
+          <h3>Watch a recipe video</h3>
+          <a id="youtube-link" class="btn-secondary" target="_blank" rel="noopener">Search YouTube</a>
+        </div>
+
+        <div id="timers-strip" class="timers-strip hidden"></div>
+
+        <div id="cook-block" class="hidden">
+          <p id="step-counter" class="muted"></p>
+          <div id="step-text" class="step-text"></div>
+          <button id="btn-start-timer" class="btn-timer hidden"></button>
+
+          <div class="button-row">
+            <button id="btn-prev-step" class="btn-secondary">Previous</button>
+            <button id="btn-next-step" class="btn-primary">Next step →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-row steps-footer">
+        <button id="btn-back-to-shopping" class="btn-secondary">Back</button>
+        <button id="btn-start-over" class="btn-secondary">Start over</button>
+      </div>
+    </section>
+
+    <div id="loading" class="loading hidden">Working…</div>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+databases:
+  - name: whats-cooking-db
+    plan: free
+    databaseName: whats_cooking
+    user: whats_cooking
+
+services:
+  - type: web
+    name: whats-cooking
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: whats-cooking-db
+          property: connectionString

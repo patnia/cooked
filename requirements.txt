@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+anthropic
+python-dotenv
+python-multipart
+pydantic
+pypdf
+ebooklib
+beautifulsoup4
+lxml
+psycopg2-binary
