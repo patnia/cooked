@@ -247,6 +247,21 @@ def set_tier(tier: str):
     return response
 
 
+@app.get("/dev/set-user-tier")
+def set_user_tier(email: str, tier: str):
+    """Grant a specific account a tier directly, independent of whichever
+    browser/device is asking -- the account-level equivalent of /dev/set-tier.
+    """
+    tier_key = tier.upper()
+    if tier_key not in Tier.__members__:
+        raise HTTPException(400, f"Unknown tier '{tier}'. Choose from: {', '.join(Tier.__members__)}")
+    user = users_db.get_user_by_email(email.strip().lower())
+    if not user:
+        raise HTTPException(404, f"No account found for {email}.")
+    users_db.set_user_tier(user["id"], tier_key)
+    return {"ok": True, "email": user["email"], "tier": tier_key}
+
+
 @app.get("/dev/reset")
 def dev_reset(request: Request):
     """Convenience for testing the fresh-visitor flow: logs out and drops

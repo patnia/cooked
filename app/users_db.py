@@ -6,6 +6,11 @@ does not (Render, and most free hosts, wipe it on every redeploy/restart/
 idle spin-down) -- so in production this points at a real Postgres instance
 via DATABASE_URL. Locally, with no DATABASE_URL set, it falls back to the
 same SQLite file the recipe library uses, so local dev needs no setup.
+
+New accounts default to PAID1, not FREE: there's no real payment provider
+wired up yet (see app/tiers.py), so gating new signups behind FREE would just
+lock everyone out with no way to pay their way in. Flip this default back to
+'FREE' once real tiers/payments exist.
 """
 
 import os
@@ -38,6 +43,7 @@ CREATE TABLE IF NOT EXISTS users (
     skill_level TEXT,
     appliance TEXT,
     language TEXT,
+    tier TEXT NOT NULL DEFAULT 'PAID1',
     created_at TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS sessions (
@@ -62,6 +68,7 @@ CREATE TABLE IF NOT EXISTS users (
     skill_level TEXT,
     appliance TEXT,
     language TEXT,
+    tier TEXT NOT NULL DEFAULT 'PAID1',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE TABLE IF NOT EXISTS sessions (
@@ -90,6 +97,9 @@ def init_users_db() -> None:
         try:
             with conn.cursor() as cur:
                 cur.execute(_POSTGRES_SCHEMA)
+                # migrate a users table created before tier existed -- the
+                # DEFAULT backfills every pre-existing row, not just new ones
+                cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS tier TEXT NOT NULL DEFAULT 'PAID1'")
             conn.commit()
         finally:
             conn.close()
@@ -97,6 +107,9 @@ def init_users_db() -> None:
         conn = _sqlite_connection()
         try:
             conn.executescript(_SQLITE_SCHEMA)
+            existing_cols = {row["name"] for row in conn.execute("PRAGMA table_info(users)")}
+            if "tier" not in existing_cols:
+                conn.execute("ALTER TABLE users ADD COLUMN tier TEXT NOT NULL DEFAULT 'PAID1'")
             conn.commit()
         finally:
             conn.close()
@@ -251,6 +264,25 @@ def delete_session(token: str) -> None:
     conn = _sqlite_connection()
     try:
         conn.execute("DELETE FROM sessions WHERE token = ?", (token,))
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def set_user_tier(user_id: int, tier: str) -> None:
+    if USE_POSTGRES:
+        conn = _pg_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("UPDATE users SET tier = %s WHERE id = %s", (tier, user_id))
+            conn.commit()
+        finally:
+            conn.close()
+        return
+
+    conn = _sqlite_connection()
+    try:
+        conn.execute("UPDATE users SET tier = ? WHERE id = ?", (tier, user_id))
         conn.commit()
     finally:
         conn.close()
